@@ -50,7 +50,7 @@
     $text = base64_encode($text); //encode the html data
     $con = connect();
     insertToDB($concat, $text, $con);
-  }
+   }
     
 
     //helper function to connect to DB
@@ -96,7 +96,7 @@
       echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
 
       mysql_close($con);
-  }
+    } 
 
     //called when we want the data back from the DB
     function retrieve($table_name) {
