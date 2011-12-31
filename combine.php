@@ -43,13 +43,12 @@
         $concat = $concat. $i;
       }
     }
-    echo $concat. ' is the concatenated string';
-
 
     //$concat = mysql_real_escape_string($concat);
     $text = base64_encode($text); //encode the html data
     $con = connect();
     insertToDB($concat, $text, $con);
+    return $concat;
    }
     
 
@@ -59,7 +58,7 @@
        * Tested with MySQL, insert appropriate variables
       */
       
-      $con = mysql_connect("localhost","#my_username","#my_password");
+      $con = mysql_connect("localhost","root","G3tSm4rt");
       if (!$con) 
       {
         die("<p>\nCould not connect: </p>" . mysql_error(). "<p>\n\n</p>");
@@ -75,7 +74,9 @@
 
       // Create table
       mysql_select_db("files", $con);
-      $sql = "CREATE TABLE file_data
+      
+      //check if table is already created, if not, create a new table file_data
+      $sql = "CREATE TABLE IF NOT EXISTS file_data 
               (
               fileId mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
               fileNames varchar(255) NOT NULL,
@@ -85,39 +86,57 @@
       // Execute query
       mysql_query($sql,$con);
 
-      $concat = mysql_real_escape_string($concat);
-      $sql="INSERT INTO file_data (fileNames, fileData) VALUES ('$concat', '$text')";
+      //check if the row containing the fileNames is already in the table
+      $sqll = "SELECT * FROM file_data WHERE fileNames = '$files'";
+      
+      $result = mysql_query($sqll);
+      $user_data = mysql_fetch_row($result);
+      
+      if(empty($user_data)) {
+      
+        $sql="INSERT INTO file_data (fileNames, fileData) VALUES ('$files', '$text')";
 
-      if (!mysql_query($sql,$con))
-      {
-        die("Error: " . mysql_error(). "<p>\n\n</p>");
+        if (!mysql_query($sql,$con))
+        {
+          die("Error: " . mysql_error(). "<p>\n\n</p>");
+        }
+
+        //echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
       }
-
-      echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
-
       mysql_close($con);
     } 
 
     //called when we want the data back from the DB
-    function retrieve($table_name) {
+    function retrieve($table_name, $fileName) {
+      //echo $fileName;
       $con = connect();
       mysql_select_db("files", $con);
+      
+      $sql = "SELECT * FROM $table_name WHERE fileNames = $fileName";
+      $result = mysql_query($sql);
+      
 
-      $result = mysql_query("SELECT * FROM $table_name");
-
-      while($row = mysql_fetch_array($result))
-      {
-        $fileData = base64_decode($row['fileData']); //decode the html data and display
-        echo $row[$fileNames] . " " . $fileData;
-        echo "<br />";
+      /* DON'T FETCH ALL ROWS, FIGURE OUT HOW TO QUERY BASED ON fileNames */
+      if (!$result) {
+        echo "Could not successfully run query ($sql) from DB: " . mysql_error();
+        exit;
       }
 
-      mysql_close($con);
+      if (mysql_num_rows($result) == 0) {
+        echo "No rows found, nothing to print so am exiting";
+        exit;
+      }
 
+      $row = mysql_fetch_assoc($result);
+      return base64_decode($row["fileData"]);
+
+      mysql_free_result($result);
+      mysql_close($con);
     } 
 
-  //run script
-  insert();
-  $table_name = 'file_data';
-  retrieve($table_name);
+    //run script
+    $table_name = 'file_data';
+    $fileNamesString = insert();
+    $fileNamesString = "'". $fileNamesString. "'";
+    $fileText = retrieve($table_name, $fileNamesString);
 ?>
