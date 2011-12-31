@@ -87,9 +87,8 @@
       mysql_query($sql,$con);
 
       //check if the row containing the fileNames is already in the table
-      $sqll = "SELECT * FROM file_data WHERE fileNames = '$files'";
-      
-      $result = mysql_query($sqll);
+      $query = "SELECT * FROM file_data WHERE fileNames = '$files'";
+      $result = mysql_query($query);
       $user_data = mysql_fetch_row($result);
       
       if(empty($user_data)) {
@@ -130,11 +129,11 @@
       $row = mysql_fetch_assoc($result);
       return base64_decode($row["fileData"]);
 
-      mysql_free_result($result);
-      mysql_close($con);
+      //mysql_free_result($result);
+      //mysql_close($con);
     } 
 
-    //run script
+    //run script which right now returns the file text
     $table_name = 'file_data';
     $fileNamesString = insert();
     $fileNamesString = "'". $fileNamesString. "'";
