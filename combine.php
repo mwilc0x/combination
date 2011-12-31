@@ -58,7 +58,7 @@
        * Tested with MySQL, insert appropriate variables
       */
       
-      $con = mysql_connect("localhost","root","G3tSm4rt");
+      $con = mysql_connect("localhost","#my_username","#my_password");
       if (!$con) 
       {
         die("<p>\nCould not connect: </p>" . mysql_error(). "<p>\n\n</p>");
