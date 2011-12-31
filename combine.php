@@ -58,7 +58,7 @@
        * Tested with MySQL, insert appropriate variables
       */
       
-      $con = mysql_connect("localhost","#my_username","#my_password");
+      $con = mysql_connect("localhost","root","G3tSm4rt");
       if (!$con) 
       {
         die("<p>\nCould not connect: </p>" . mysql_error(). "<p>\n\n</p>");
@@ -111,11 +111,10 @@
       $con = connect();
       mysql_select_db("files", $con);
       
+      //procedure to query DB to retrieve row of data that we are looking for
       $sql = "SELECT * FROM $table_name WHERE fileNames = $fileName";
       $result = mysql_query($sql);
       
-
-      /* DON'T FETCH ALL ROWS, FIGURE OUT HOW TO QUERY BASED ON fileNames */
       if (!$result) {
         echo "Could not successfully run query ($sql) from DB: " . mysql_error();
         exit;
@@ -138,4 +137,5 @@
     $fileNamesString = insert();
     $fileNamesString = "'". $fileNamesString. "'";
     $fileText = retrieve($table_name, $fileNamesString);
+    echo $fileText;
 ?>
