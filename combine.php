@@ -2,9 +2,9 @@
 
   /*
    * Author: Mike Wilcox
-   * JS/CSS Database Cache PHP Script
+   * JS/CSS Combo Cache PHP Script
    * 
-   * This program extracts JS/CSS files from a user input query
+   * This program extracts JS/CSS files from a query string,
    * combining the file names into one string, and the text data
    * into one text field. It then places these two variables
    * into a database. The user can then retrieve the data and
@@ -86,6 +86,10 @@
       // Execute query
       mysql_query($sql,$con);
 
+      //SQL injection prevention
+      $files = mysql_real_escape_string($files);
+      $text = mysql_real_escape_string($text);
+
       //check if the row containing the fileNames is already in the table
       $query = "SELECT * FROM file_data WHERE fileNames = '$files'";
       $result = mysql_query($query);
@@ -100,7 +104,7 @@
           die("Error: " . mysql_error(). "<p>\n\n</p>");
         }
 
-        //echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
+        echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
       }
       mysql_close($con);
     } 
@@ -111,9 +115,15 @@
       $con = connect();
       mysql_select_db("files", $con);
       
+
+      //prevent SQL injection
+      //$table_name = mysql_real_escape_string($table_name);
+      //$fileName = mysql_real_escape_string($fileName);      
+
       //procedure to query DB to retrieve row of data that we are looking for
       $sql = "SELECT * FROM $table_name WHERE fileNames = $fileName";
       $result = mysql_query($sql);
+      //$result = mysql_real_escape_string($result);
       
       if (!$result) {
         echo "Could not successfully run query ($sql) from DB: " . mysql_error();
@@ -122,10 +132,11 @@
 
       if (mysql_num_rows($result) == 0) {
         echo "No rows found, nothing to print so am exiting";
-        exit;
+        //exit;
       }
 
       $row = mysql_fetch_assoc($result);
+      echo base64_decode($row["fileData"]);
       return base64_decode($row["fileData"]);
 
       //mysql_free_result($result);
@@ -137,5 +148,5 @@
     $fileNamesString = insert();
     $fileNamesString = "'". $fileNamesString. "'";
     $fileText = retrieve($table_name, $fileNamesString);
-    echo $fileText;
+    //echo $fileText;
 ?>
