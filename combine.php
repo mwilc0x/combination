@@ -143,10 +143,15 @@
       //mysql_close($con);
     } 
 
-    //run script which right now returns the file text
-    $table_name = 'file_data';
-    $fileNamesString = insert();
-    $fileNamesString = "'". $fileNamesString. "'";
-    $fileText = retrieve($table_name, $fileNamesString);
-    //echo $fileText;
+
+	function run() {
+		//run script which right now returns the file text
+		$table_name = 'file_data';
+		$fileNamesString = insert();
+		$fileNamesString = "'". $fileNamesString. "'";
+		$fileText = retrieve($table_name, $fileNamesString);
+		return $fileText;
+	}
+
+	echo run();
 ?>
