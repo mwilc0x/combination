@@ -65,7 +65,7 @@ require_once('config.php');
               fileNames varchar(255) NOT NULL,
 			  fileData TEXT NOT NULL,
 			  contentType VARCHAR(255) NOT NULL DEFAULT 'text/plain',
-			  createdAt DATETIME DEFAULT NOW()
+			  createdAt DATETIME DEFAULT '0000-00-00 00:00:00'
               )";
 
       // Execute query
