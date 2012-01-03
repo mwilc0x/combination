@@ -86,6 +86,8 @@ function bootstrap() {
       	//prevent SQL injection
       	$table_name = mysql_real_escape_string($table_name);
       	$fileName = mysql_real_escape_string($fileName); 
+      	//$table_name = mysql_real_escape_string($table_name);
+      	$fileName = mysql_real_escape_string($fileName);      
 	//procedure to query DB to retrieve row of data that we are looking for
       	$sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
       	$result = mysql_query($sql);
