@@ -18,6 +18,22 @@
 // Load MySQL config and initialize connection
 require_once('config.php');
 
+
+function bootstrap() {
+	//check if table is already created, if not, create a new table file_data
+	$sql = "CREATE TABLE IF NOT EXISTS file_data 
+		  (
+		  fileId mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		  fileNames varchar(255) NOT NULL,
+		  fileData TEXT NOT NULL,
+		  contentType VARCHAR(255) NOT NULL DEFAULT 'text/plain',
+		  createdAt DATETIME DEFAULT '0000-00-00 00:00:00'
+		  )";
+
+	// Execute query
+	mysql_query($sql, $my_conn); // mysql will automatically use the 1st open connection. no need for 2nd parameter here.
+}
+
   //extract variables from the query and calls func insertToDB() to insert data
   function insert() {
 
@@ -58,18 +74,6 @@ require_once('config.php');
     function insertToDB($files, $text)
     {
 
-      //check if table is already created, if not, create a new table file_data
-      $sql = "CREATE TABLE IF NOT EXISTS file_data 
-              (
-              fileId mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
-              fileNames varchar(255) NOT NULL,
-			  fileData TEXT NOT NULL,
-			  contentType VARCHAR(255) NOT NULL DEFAULT 'text/plain',
-			  createdAt DATETIME DEFAULT '0000-00-00 00:00:00'
-              )";
-
-      // Execute query
-      mysql_query($sql); // mysql will automatically use the 1st open connection. no need for 2nd parameter here.
 
       //SQL injection prevention
       $files = mysql_real_escape_string($files);
@@ -124,6 +128,7 @@ require_once('config.php');
 
 
 	function run() {
+		bootstrap();
 		//run script which right now returns the file text
 		$table_name = 'file_data';
 		$fileNamesString = insert();
