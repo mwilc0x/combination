@@ -31,7 +31,7 @@ function bootstrap() {
 		  )";
 
 	// Execute query
-	mysql_query($sql, $my_conn); // mysql will automatically use the 1st open connection. no need for 2nd parameter here.
+	mysql_query($sql);
 }
 
   //extract variables from the query and calls func insertToDB() to insert data
