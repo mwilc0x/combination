@@ -80,7 +80,9 @@
               (
               fileId mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
               fileNames varchar(255) NOT NULL,
-              fileData TEXT NOT NULL
+			  fileData TEXT NOT NULL,
+			  contentType VARCHAR(255) NOT NULL DEFAULT 'text/plain',
+			  createdAt DATETIME DEFAULT NOW()
               )";
 
       // Execute query
