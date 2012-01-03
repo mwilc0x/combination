@@ -2,7 +2,7 @@
 
   /*
    * Authors: Mike Green, Mike Wilcox
-   * JS/CSS Combo Cache PHP Script
+   * JS/CSS Combo Cache Script
    * 
    * This program extracts JS/CSS files from a query string,
    * combining the file names into one string, and the text data
