@@ -100,7 +100,7 @@ require_once('config.php');
       $fileName = mysql_real_escape_string($fileName);      
 
       //procedure to query DB to retrieve row of data that we are looking for
-      $sql = "SELECT * FROM $table_name WHERE fileNames = $fileName";
+      $sql = "SELECT * FROM $table_name WHERE fileNames = '$fileName'";
       $result = mysql_query($sql);
       //$result = mysql_real_escape_string($result);
       
