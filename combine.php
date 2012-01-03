@@ -15,6 +15,24 @@
    * it and broke the script. 
   */
   
+// Load MySQL config and initialize connection
+require_once('config.php');
+
+
+function bootstrap() {
+	//check if table is already created, if not, create a new table file_data
+	$sql = "CREATE TABLE IF NOT EXISTS file_data 
+		  (
+		  file_id mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		  file_name varchar(255) NOT NULL,
+		  file_data TEXT NOT NULL,
+		  content_type VARCHAR(255) NOT NULL DEFAULT 'text/plain',
+		  created_at DATETIME DEFAULT '0000-00-00 00:00:00'
+		  )";
+
+	// Execute query
+	mysql_query($sql, $my_conn); // mysql will automatically use the 1st open connection. no need for 2nd parameter here.
+}
 
   //extract variables from the query and calls func insertToDB() to insert data
   function insert() {
@@ -29,6 +47,8 @@
 
       $html = "http://";
 
+	  // What is this doing?
+	  //
       //see if it's a html page and if not, grab the file
       if(substr($i, 0, 7) == $html)
       {
@@ -46,82 +66,45 @@
 
     //$concat = mysql_real_escape_string($concat);
     $text = base64_encode($text); //encode the html data
-    $con = connect();
-    insertToDB($concat, $text, $con);
+    insertToDB($concat, $text);
     return $concat;
    }
     
-
-    //helper function to connect to DB
-    function connect() {
-      /* Connect and setup table in database. 
-       * Tested with MySQL, insert appropriate variables
-      */
-      
-      $con = mysql_connect("localhost","#my_user","#my_pass");
-      if (!$con) 
-      {
-        die("<p>\nCould not connect: </p>" . mysql_error(). "<p>\n\n</p>");
-      }
-      
-      return $con;
-    }
-    
-
     //sets up the table in DB and inserts appropriate data
-    function insertToDB($files, $text, $con)
+    function insertToDB($files, $text)
     {
 
-      // Create table
-      mysql_select_db("files", $con);
-      
-      //check if table is already created, if not, create a new table file_data
-      $sql = "CREATE TABLE IF NOT EXISTS file_data 
-              (
-              fileId mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
-              fileNames varchar(255) NOT NULL,
-              fileData TEXT NOT NULL
-              )";
-
-      // Execute query
-      mysql_query($sql,$con);
 
       //SQL injection prevention
       $files = mysql_real_escape_string($files);
       $text = mysql_real_escape_string($text);
 
       //check if the row containing the fileNames is already in the table
-      $query = "SELECT * FROM file_data WHERE fileNames = '$files'";
+      $query = "SELECT * FROM file_data WHERE file_name = '$files'";
       $result = mysql_query($query);
       $user_data = mysql_fetch_row($result);
       
       if(empty($user_data)) {
       
-        $sql="INSERT INTO file_data (fileNames, fileData) VALUES ('$files', '$text')";
+        $sql="INSERT INTO file_data (file_name, file_data) VALUES ('$files', '$text')";
 
-        if (!mysql_query($sql,$con))
+        if (!mysql_query($sql))
         {
           die("Error: " . mysql_error(). "<p>\n\n</p>");
         }
 
         echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
       }
-      mysql_close($con);
     } 
 
     //called when we want the data back from the DB
     function retrieve($table_name, $fileName) {
-      //echo $fileName;
-      $con = connect();
-      mysql_select_db("files", $con);
-      
-
       //prevent SQL injection
       //$table_name = mysql_real_escape_string($table_name);
-      //$fileName = mysql_real_escape_string($fileName);      
+      $fileName = mysql_real_escape_string($fileName);      
 
       //procedure to query DB to retrieve row of data that we are looking for
-      $sql = "SELECT * FROM $table_name WHERE fileNames = $fileName";
+      $sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
       $result = mysql_query($sql);
       //$result = mysql_real_escape_string($result);
       
@@ -136,17 +119,24 @@
       }
 
       $row = mysql_fetch_assoc($result);
-      echo base64_decode($row["fileData"]);
-      return base64_decode($row["fileData"]);
+      echo base64_decode($row["file_data"]);
+      return base64_decode($row["file_data"]);
 
       //mysql_free_result($result);
       //mysql_close($con);
     } 
 
-    //run script which right now returns the file text
-    $table_name = 'file_data';
-    $fileNamesString = insert();
-    $fileNamesString = "'". $fileNamesString. "'";
-    $fileText = retrieve($table_name, $fileNamesString);
-    //echo $fileText;
+
+	function run() {
+		bootstrap();
+		//run script which right now returns the file text
+		$table_name = 'file_data';
+		$fileNamesString = insert();
+		$fileNamesString = "'". $fileNamesString. "'";
+		$fileText = retrieve($table_name, $fileNamesString);
+		return $fileText;
+	}
+
+	echo run();
+	mysql_close($my_conn); // don't close SQL connection until the end.
 ?>
