@@ -23,11 +23,11 @@ function bootstrap() {
 	//check if table is already created, if not, create a new table file_data
 	$sql = "CREATE TABLE IF NOT EXISTS file_data 
 		  (
-		  fileId mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
-		  fileNames varchar(255) NOT NULL,
-		  fileData TEXT NOT NULL,
-		  contentType VARCHAR(255) NOT NULL DEFAULT 'text/plain',
-		  createdAt DATETIME DEFAULT '0000-00-00 00:00:00'
+		  file_id mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
+		  file_name varchar(255) NOT NULL,
+		  file_data TEXT NOT NULL,
+		  content_type VARCHAR(255) NOT NULL DEFAULT 'text/plain',
+		  created_at DATETIME DEFAULT '0000-00-00 00:00:00'
 		  )";
 
 	// Execute query
@@ -80,13 +80,13 @@ function bootstrap() {
       $text = mysql_real_escape_string($text);
 
       //check if the row containing the fileNames is already in the table
-      $query = "SELECT * FROM file_data WHERE fileNames = '$files'";
+      $query = "SELECT * FROM file_data WHERE file_name = '$files'";
       $result = mysql_query($query);
       $user_data = mysql_fetch_row($result);
       
       if(empty($user_data)) {
       
-        $sql="INSERT INTO file_data (fileNames, fileData) VALUES ('$files', '$text')";
+        $sql="INSERT INTO file_data (file_name, file_data) VALUES ('$files', '$text')";
 
         if (!mysql_query($sql))
         {
@@ -104,7 +104,7 @@ function bootstrap() {
       $fileName = mysql_real_escape_string($fileName);      
 
       //procedure to query DB to retrieve row of data that we are looking for
-      $sql = "SELECT * FROM $table_name WHERE fileNames = '$fileName'";
+      $sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
       $result = mysql_query($sql);
       //$result = mysql_real_escape_string($result);
       
@@ -119,8 +119,8 @@ function bootstrap() {
       }
 
       $row = mysql_fetch_assoc($result);
-      echo base64_decode($row["fileData"]);
-      return base64_decode($row["fileData"]);
+      echo base64_decode($row["file_data"]);
+      return base64_decode($row["file_data"]);
 
       //mysql_free_result($result);
       //mysql_close($con);
