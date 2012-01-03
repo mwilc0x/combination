@@ -1,7 +1,7 @@
 <?php
 
   /*
-   * Author: Mike Wilcox
+   * Authors: Mike Green, Mike Wilcox
    * JS/CSS Combo Cache PHP Script
    * 
    * This program extracts JS/CSS files from a query string,
@@ -11,9 +11,7 @@
    * display the data in their browser. This script is a work
    * in progress!
    *
-   * TODO: Seperate functions into different files, started doing
-   * it and broke the script. 
-  */
+   */
   
 // Load MySQL config and initialize connection
 require_once('config.php');
@@ -63,10 +61,9 @@ function bootstrap() {
     
   //sets up the table in DB and inserts appropriate data
   function insertToDB($files, $text) {
-      	//SQL injection prevention
+      	//SQL injection prevention, store data in db row
       	$files = mysql_real_escape_string($files);
       	$text = mysql_real_escape_string($text);
-	//check if the row containing the fileNames is already in the table
       	$query = "SELECT * FROM file_data WHERE file_name = '$files'";
       	$result = mysql_query($query);
       	$user_data = mysql_fetch_row($result);
@@ -83,15 +80,13 @@ function bootstrap() {
 
   //called when we want the data back from the DB
   function retrieve($table_name, $fileName) {
-      	//prevent SQL injection
+      	//SQL injection prevention, run queries to find row of data
       	$table_name = mysql_real_escape_string($table_name);
       	$fileName = mysql_real_escape_string($fileName); 
-      	//$table_name = mysql_real_escape_string($table_name);
+      	$table_name = mysql_real_escape_string($table_name);
       	$fileName = mysql_real_escape_string($fileName);      
-	//procedure to query DB to retrieve row of data that we are looking for
       	$sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
       	$result = mysql_query($sql);
-      	//$result = mysql_real_escape_string($result);
       
       	if (!$result) {
         	echo "Could not successfully run query ($sql) from DB: " . mysql_error();
