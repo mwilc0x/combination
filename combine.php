@@ -54,9 +54,24 @@ function bootstrap() {
         		$concat = $concat. $i;
       		}
     	}
-    	$text = base64_encode($text); //encode the html data
-    	insertToDB($concat, $text);
-    	return $concat;
+
+        $concat = mysql_real_escape_string($concat);
+        $fileName = mysql_real_escape_string($fileName);
+        $sql = "SELECT * FROM file_data WHERE file_name = '$fileName'";
+        $result = mysql_query($sql);
+
+        if (!$result) {
+                echo "Could not successfully run query ($sql) from DB: " . mysql_error();
+                exit;
+        }
+
+        if (mysql_num_rows($result) == 0) {
+    		$text = base64_encode($text); //encode the html data
+    		insertToDB($concat, $text);
+    		return $concat;
+	} else {
+		return $concat;
+	}
    }
     
   //sets up the table in DB and inserts appropriate data
@@ -82,9 +97,7 @@ function bootstrap() {
   function retrieve($table_name, $fileName) {
       	//SQL injection prevention, run queries to find row of data
       	$table_name = mysql_real_escape_string($table_name);
-      	$fileName = mysql_real_escape_string($fileName); 
-      	$table_name = mysql_real_escape_string($table_name);
-      	$fileName = mysql_real_escape_string($fileName);      
+      	$fileName = mysql_real_escape_string($fileName);  
       	$sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
       	$result = mysql_query($sql);
       
