@@ -56,8 +56,7 @@ function bootstrap() {
     	}
 
         $concat = mysql_real_escape_string($concat);
-        $fileName = mysql_real_escape_string($fileName);
-        $sql = "SELECT * FROM file_data WHERE file_name = '$fileName'";
+        $sql = "SELECT * FROM file_data WHERE file_name = '$concat'";
         $result = mysql_query($sql);
 
         if (!$result) {
