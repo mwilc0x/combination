@@ -36,95 +36,76 @@ function bootstrap() {
 
   //extract variables from the query and calls func insertToDB() to insert data
   function insert() {
+	$i = 0;
+	$concat = "";
+    	$text = "";
+    	
+    	//grab each variable from $_GET array    
+    	foreach ($_GET['files'] as $key => $i) {
+		$html = "http://";
+      		if(substr($i, 0, 7) == $html)
+      		{
+         		$text = $text. file_get_contents($i);
+         		$concat = $concat. $i;
+      		}
+      		else 
+      		{
+        		$text = $text. file_get_contents($i);
+        		$concat = $concat. $i;
+      		}
+    	}
 
-    $i = 0;
-    $concat = "";
-    $text = "";
-
-
-    //grab each variable from $_GET array    
-    foreach ($_GET['files'] as $key => $i) {
-
-      $html = "http://";
-
-	  // What is this doing?
-	  //
-      //see if it's a html page and if not, grab the file
-      if(substr($i, 0, 7) == $html)
-      {
-         $text = $text. file_get_contents($i);
-         $concat = $concat. $i;
-         //echo $text;
-      }
-      else 
-      {
-        $text = $text. file_get_contents($i);
-        //echo $text;
-        $concat = $concat. $i;
-      }
-    }
-
-    //$concat = mysql_real_escape_string($concat);
-    $text = base64_encode($text); //encode the html data
-    insertToDB($concat, $text);
-    return $concat;
+    	//$concat = mysql_real_escape_string($concat);
+    	$text = base64_encode($text); //encode the html data
+    	insertToDB($concat, $text);
+    	return $concat;
    }
     
     //sets up the table in DB and inserts appropriate data
-    function insertToDB($files, $text)
-    {
-
-
-      //SQL injection prevention
-      $files = mysql_real_escape_string($files);
-      $text = mysql_real_escape_string($text);
-
-      //check if the row containing the fileNames is already in the table
-      $query = "SELECT * FROM file_data WHERE file_name = '$files'";
-      $result = mysql_query($query);
-      $user_data = mysql_fetch_row($result);
+  function insertToDB($files, $text) {
+      	//SQL injection prevention
+      	$files = mysql_real_escape_string($files);
+      	$text = mysql_real_escape_string($text);
+	//check if the row containing the fileNames is already in the table
+      	$query = "SELECT * FROM file_data WHERE file_name = '$files'";
+      	$result = mysql_query($query);
+      	$user_data = mysql_fetch_row($result);
       
-      if(empty($user_data)) {
+      	if(empty($user_data)) {
       
-        $sql="INSERT INTO file_data (file_name, file_data) VALUES ('$files', '$text')";
+        	$sql="INSERT INTO file_data (file_name, file_data) VALUES ('$files', '$text')";
 
-        if (!mysql_query($sql))
-        {
-          die("Error: " . mysql_error(). "<p>\n\n</p>");
-        }
+        	if (!mysql_query($sql))
+        	{
+          		die("Error: " . mysql_error(). "<p>\n\n</p>");
+        	}
+        	echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
+      	}
+  } 
 
-        echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
-      }
-    } 
-
-    //called when we want the data back from the DB
-    function retrieve($table_name, $fileName) {
-      //prevent SQL injection
-      //$table_name = mysql_real_escape_string($table_name);
-      $fileName = mysql_real_escape_string($fileName);      
-
-      //procedure to query DB to retrieve row of data that we are looking for
-      $sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
-      $result = mysql_query($sql);
-      //$result = mysql_real_escape_string($result);
+  //called when we want the data back from the DB
+  function retrieve($table_name, $fileName) {
+      	//prevent SQL injection
+      	//$table_name = mysql_real_escape_string($table_name);
+      	$fileName = mysql_real_escape_string($fileName);      
+	//procedure to query DB to retrieve row of data that we are looking for
+      	$sql = "SELECT * FROM $table_name WHERE file_name = '$fileName'";
+      	$result = mysql_query($sql);
+      	//$result = mysql_real_escape_string($result);
       
-      if (!$result) {
-        echo "Could not successfully run query ($sql) from DB: " . mysql_error();
-        exit;
-      }
+      	if (!$result) {
+        	echo "Could not successfully run query ($sql) from DB: " . mysql_error();
+        	exit;
+      	}
 
-      if (mysql_num_rows($result) == 0) {
-        echo "No rows found, nothing to print so am exiting";
-        //exit;
-      }
+      	if (mysql_num_rows($result) == 0) {
+        	echo "No rows found, nothing to print so am exiting";
+      	}
 
-      $row = mysql_fetch_assoc($result);
-      echo base64_decode($row["file_data"]);
-      return base64_decode($row["file_data"]);
-
-      //mysql_free_result($result);
-      //mysql_close($con);
-    } 
+      	$row = mysql_fetch_assoc($result);
+      	echo base64_decode($row["file_data"]);
+      	return base64_decode($row["file_data"]);
+  } 
 
 
 	function run() {
