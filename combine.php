@@ -39,29 +39,29 @@ function bootstrap() {
 	$i = 0;
 	$concat = "";
     	$text = "";
-    	
-    	//grab each variable from $_GET array    
+    	   
+    	/* Grab variables from the $_GET array
+    	 * Check if variable starts with 'http://'
+    	 * If so, it's a file from the web else 
+    	 * it's a file stored on disk.
+    	*/
     	foreach ($_GET['files'] as $key => $i) {
 		$html = "http://";
-      		if(substr($i, 0, 7) == $html)
-      		{
+      		if(substr($i, 0, 7) == $html) {
          		$text = $text. file_get_contents($i);
          		$concat = $concat. $i;
       		}
-      		else 
-      		{
+      		else {
         		$text = $text. file_get_contents($i);
         		$concat = $concat. $i;
       		}
     	}
-
-    	//$concat = mysql_real_escape_string($concat);
     	$text = base64_encode($text); //encode the html data
     	insertToDB($concat, $text);
     	return $concat;
    }
     
-    //sets up the table in DB and inserts appropriate data
+  //sets up the table in DB and inserts appropriate data
   function insertToDB($files, $text) {
       	//SQL injection prevention
       	$files = mysql_real_escape_string($files);
@@ -72,11 +72,9 @@ function bootstrap() {
       	$user_data = mysql_fetch_row($result);
       
       	if(empty($user_data)) {
-      
         	$sql="INSERT INTO file_data (file_name, file_data) VALUES ('$files', '$text')";
-
-        	if (!mysql_query($sql))
-        	{
+        	
+        	if (!mysql_query($sql)) {
           		die("Error: " . mysql_error(). "<p>\n\n</p>");
         	}
         	echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
