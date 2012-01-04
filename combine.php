@@ -23,16 +23,17 @@ require_once('config.php');
 		  file_name varchar(255) NOT NULL,
 		  file_data TEXT NOT NULL,
 		  content_type VARCHAR(255) NOT NULL DEFAULT 'text/plain',
-		  created_at TIMESTAMP(8),
+		  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 		  INDEX fname_ind (file_name)
 		  )";
 
 	// Execute query
 	mysql_query($create_table);
 	$i = 0;
+	$j = 0;
 	$concat = "";
     	$text = "";
-    	   
+	$time = array();  	   
     	/* Grab variables from the $_GET array
     	 * Check if variable starts with 'http://'
     	 * If so, it's a file from the web else 
@@ -47,11 +48,15 @@ require_once('config.php');
       		else {
         		$text = $text. file_get_contents($i);
         		$concat = $concat. $i;
+			//echo "$i was last modified:    ".  date ("Y-m-d h:i:s", filemtime($i));
+			//echo "<p>\n\n</p>";
+			$time[] = date ("Y-m-d H:i:s", filemtime($i));
       		}
     	}
 
         $concat = mysql_real_escape_string($concat);
 	$text = mysql_real_escape_string($text);
+	$text = base64_encode($text);
         $select = "SELECT * FROM file_data WHERE file_name = '$concat'";
         $result = mysql_query($select);
 
@@ -61,7 +66,6 @@ require_once('config.php');
         }
 
         if (mysql_num_rows($result) == 0) {
-    		$text = base64_encode($text); //encode the html data
         	$insert="INSERT INTO file_data (file_name, file_data) VALUES ('$concat', '$text')";
         	
         	if (!mysql_query($insert)) {
@@ -70,9 +74,20 @@ require_once('config.php');
         	echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
       	}
 	else {
-      		$row = mysql_fetch_assoc($result);
+		$row = mysql_fetch_assoc($result);
+		foreach($time as $key => $date){
+			/* if the date of modified file on disk is greater than the date when files were stored
+			 * in the db, then we need to update the combo in the db
+			*/
+			if(strtotime($row["created_at"]) < strtotime($date)) {
+				$insert = "UPDATE file_data SET file_data='$text' WHERE file_name='$concat'";
+				if (!mysql_query($insert)) {
+                        		die("Error: " . mysql_error(). "<p>\n\n</p>");
+                		}
+                		echo "<p>SUCCESSFULLY UPDATED RECORD TO DB\n\n</p>";
+			}
+		}
       		echo stripslashes(base64_decode($row["file_data"]));
-	
 	}
 	mysql_close($my_conn); // don't close SQL connection until the end.
 ?>
