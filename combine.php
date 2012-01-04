@@ -51,8 +51,8 @@ require_once('config.php');
 
         $concat = mysql_real_escape_string($concat);
 	$text = mysql_real_escape_string($text);
-        $sql = "SELECT * FROM file_data WHERE file_name = '$concat'";
-        $result = mysql_query($sql);
+        $select = "SELECT * FROM file_data WHERE file_name = '$concat'";
+        $result = mysql_query($select);
 
         if (!$result) {
                 echo "Could not successfully run query ($sql) from DB: " . mysql_error();
@@ -61,23 +61,14 @@ require_once('config.php');
 
         if (mysql_num_rows($result) == 0) {
     		$text = base64_encode($text); //encode the html data
-        	$sql="INSERT INTO file_data (file_name, file_data) VALUES ('$concat', '$text')";
+        	$insert="INSERT INTO file_data (file_name, file_data) VALUES ('$concat', '$text')";
         	
-        	if (!mysql_query($sql)) {
+        	if (!mysql_query($insert)) {
           		die("Error: " . mysql_error(). "<p>\n\n</p>");
         	}
         	echo "<p>SUCCESSFULLY ADDED RECORD TO DB\n\n</p>";
       	}
 	else {
-		//SQL injection prevention, run queries to find row of data  
-      		$sql = "SELECT * FROM file_data WHERE file_name = '$concat'";
-      		$result = mysql_query($sql);
-      
-      		if (!$result) {
-        		echo "Could not successfully run query ($sql) from DB: " . mysql_error();
-        		exit;
-      		}
-
       		$row = mysql_fetch_assoc($result);
       		echo stripslashes(base64_decode($row["file_data"]));
 	}
