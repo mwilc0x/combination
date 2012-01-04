@@ -53,8 +53,8 @@ require_once('config.php');
     	}
 
         $concat = mysql_real_escape_string($concat);
+        $text = base64_encode($text);
 	$text = mysql_real_escape_string($text);
-	$text = base64_encode($text);
         $select = "SELECT * FROM file_data WHERE file_name = '$concat'";
         $result = mysql_query($select);
 
