@@ -79,7 +79,7 @@ require_once('config.php');
       		}
 
       		$row = mysql_fetch_assoc($result);
-      		echo base64_decode($row["file_data"]);
+      		echo stripslashes(base64_decode($row["file_data"]));
 	}
 	mysql_close($my_conn); // don't close SQL connection until the end.
 ?>
