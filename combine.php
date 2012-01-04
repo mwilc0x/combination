@@ -17,17 +17,18 @@
 require_once('config.php');
 
 	//check if table is already created, if not, create a new table file_data
-	$sql = "CREATE TABLE IF NOT EXISTS file_data 
+	$create_table = "CREATE TABLE IF NOT EXISTS file_data 
 		  (
 		  file_id mediumint NOT NULL PRIMARY KEY AUTO_INCREMENT,
 		  file_name varchar(255) NOT NULL,
 		  file_data TEXT NOT NULL,
 		  content_type VARCHAR(255) NOT NULL DEFAULT 'text/plain',
-		  created_at DATETIME DEFAULT '0000-00-00 00:00:00'
+		  created_at TIMESTAMP(8),
+		  INDEX fname_ind (file_name)
 		  )";
 
 	// Execute query
-	mysql_query($sql);
+	mysql_query($create_table);
 	$i = 0;
 	$concat = "";
     	$text = "";
@@ -55,7 +56,7 @@ require_once('config.php');
         $result = mysql_query($select);
 
         if (!$result) {
-                echo "Could not successfully run query ($sql) from DB: " . mysql_error();
+                echo "Could not successfully run query ($select) from DB: " . mysql_error();
                 exit;
         }
 
@@ -71,6 +72,7 @@ require_once('config.php');
 	else {
       		$row = mysql_fetch_assoc($result);
       		echo stripslashes(base64_decode($row["file_data"]));
+	
 	}
 	mysql_close($my_conn); // don't close SQL connection until the end.
 ?>
