@@ -48,8 +48,6 @@ require_once('config.php');
       		else {
         		$text = $text. file_get_contents($i);
         		$concat = $concat. $i;
-			//echo "$i was last modified:    ".  date ("Y-m-d h:i:s", filemtime($i));
-			//echo "<p>\n\n</p>";
 			$time[] = date ("Y-m-d H:i:s", filemtime($i));
       		}
     	}
@@ -76,9 +74,8 @@ require_once('config.php');
 	else {
 		$row = mysql_fetch_assoc($result);
 		foreach($time as $key => $date){
-			/* if the date of modified file on disk is greater than the date when files were stored
-			 * in the db, then we need to update the combo in the db
-			*/
+			/* If the date of modified file on disk is greater than the date when files were stored
+			   in the db, then we need to update the combo in the db */
 			if(strtotime($row["created_at"]) < strtotime($date)) {
 				$insert = "UPDATE file_data SET file_data='$text' WHERE file_name='$concat'";
 				if (!mysql_query($insert)) {
