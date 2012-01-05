@@ -11,14 +11,24 @@ class FileCombiner {
 	public $concatenation;
 	private $response;
 
+	public function generate_slug($separator="::") {
+		$buff = "";
+
+		foreach ($this->files as $file) {
+			$buff .= $file . $separator;
+		}
+
+		rtrim($buff, $separator);
+		$this->slug = $buff;
+		return $buff;
+	}
+
 	public function combine() {
 		$content_buffer = "";
-		$slug_buffer = "";
 
-		// Loop thru files, build slug and concatenated contents at the same time.
-		foreach ($this->$files as $file) {
+		// Loop thru files, build concatenated contents.
+		foreach ($this->files as $file) {
 			try {
-				$slug_buffer .= $file . "::";
 				$content_buffer .= get_contents($file);
 				$content_buffer .= "\n";
 			} catch (Exception $e) {
@@ -27,12 +37,8 @@ class FileCombiner {
 			}
 		}
 
-		// trim trailing "::" from slug string
-		rtrim($slug_buffer, ':');
-
-		$this->slug = $slug_buffer;
 		$this->concatenation = $content_buffer;
-		return true;
+		return $content_buffer;
 	}
 
 	private function get_contents($filename) {
